@@ -4,15 +4,16 @@ import androidx.lifecycle.ViewModel
 import com.example.plantapp.R
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import java.time.LocalDate
+//import java.time.LocalDate
+import org.threeten.bp.LocalDate
 
 data class Plant(
     val id: Int,
     val name: String,
     val species: String,
-    val imageResId: Int, // Drawable resource ID (e.g., R.drawable.basil)
+    val imageResId: Int,
     val lastWatered: LocalDate,
-    val wateringInterval: Int, // Days
+    val wateringInterval: Int,
     val notes: String
 )
 class PlantViewModel : ViewModel() {
@@ -20,14 +21,13 @@ class PlantViewModel : ViewModel() {
     val plants: StateFlow<List<Plant>> = _plants
 
     init {
-        // Sample data (replace with actual drawables like R.drawable.basil)
         _plants.value = listOf(
             Plant(
                 1,
                 "Basil",
                 "Ocimum basilicum",
                 R.drawable.ic_launcher_foreground,
-                LocalDate.now().minusDays(3),
+                LocalDate.now(),
                 7,
                 "Needs sunlight."
             ),
@@ -36,7 +36,7 @@ class PlantViewModel : ViewModel() {
                 "Rose",
                 "Rosa",
                 R.drawable.ic_launcher_foreground,
-                LocalDate.now().minusDays(5),
+                LocalDate.now(),
                 3,
                 "Water roots only."
             )

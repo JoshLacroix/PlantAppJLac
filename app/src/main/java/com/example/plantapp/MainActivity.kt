@@ -18,10 +18,12 @@ import com.example.plantapp.Screens.AddEditPlantScreen
 import com.example.plantapp.Screens.PlantDetailScreen
 import com.example.plantapp.Screens.PlantsScreen
 import com.example.plantapp.ui.theme.PlantAppTheme
+import com.jakewharton.threetenabp.AndroidThreeTen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        AndroidThreeTen.init(this)
         enableEdgeToEdge()
         setContent {
             PlantAppTheme {
@@ -41,7 +43,8 @@ fun AppNavigation(modifier: Modifier = Modifier) {
             PlantsScreen(navController)
         }
         composable("plantDetail/{plantId}") { backStackEntry ->
-            PlantDetailScreen(navController)
+            val plantId = backStackEntry.arguments?.getString("plantId")?.toIntOrNull()
+            PlantDetailScreen(navController, plantId )
         }
         composable("addPlant") {
             AddEditPlantScreen(navController)
