@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -46,6 +45,7 @@ fun PlantDetailScreen(navController: NavController,plantId: Int?) {
             contentDescription = plant.name,
             modifier = Modifier.size(200.dp)
         )
+
         Spacer(modifier = Modifier.height(16.dp))
 
         Text("Name ${plant.name}")
@@ -55,6 +55,7 @@ fun PlantDetailScreen(navController: NavController,plantId: Int?) {
         Text("Notes: ${plant.notes}")
 
         Spacer(modifier = Modifier.height(16.dp))
+
         Button(onClick = {navController.navigate("editPlant/${plant.id}")}) {
             Text("Edit Plant")
         }

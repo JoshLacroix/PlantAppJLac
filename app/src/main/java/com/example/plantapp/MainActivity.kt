@@ -47,10 +47,11 @@ fun AppNavigation(modifier: Modifier = Modifier) {
             PlantDetailScreen(navController, plantId )
         }
         composable("addPlant") {
-            AddEditPlantScreen(navController)
+            AddEditPlantScreen(navController, null)
         }
         composable("editPlant/{plantId}") { backStackEntry ->
-            AddEditPlantScreen(navController)
+            val plantId = backStackEntry.arguments?.getString("plantId")?.toIntOrNull()
+            AddEditPlantScreen(navController, plantId)
         }
     }
 }
