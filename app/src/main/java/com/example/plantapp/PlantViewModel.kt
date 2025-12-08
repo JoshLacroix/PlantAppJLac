@@ -1,7 +1,6 @@
-package com.example.plantapp.Screens
+package com.example.plantapp
 
 import androidx.lifecycle.ViewModel
-import com.example.plantapp.R
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 //import java.time.LocalDate
@@ -36,7 +35,7 @@ class PlantViewModel : ViewModel() {
                 "Rose",
                 "Rosa",
                 R.drawable.ic_launcher_foreground,
-                LocalDate.now(),
+                LocalDate.now().minusDays(5),
                 3,
                 "Water roots only."
             )

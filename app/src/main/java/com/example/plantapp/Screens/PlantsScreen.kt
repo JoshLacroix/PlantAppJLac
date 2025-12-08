@@ -1,6 +1,7 @@
 package com.example.plantapp.Screens
 
-import android.R.attr.padding
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
@@ -13,7 +14,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material3.Button
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -23,19 +25,30 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.plantapp.PlantViewModel
 
 @Composable
 fun PlantsScreen(navController: NavController) {
     val viewModel: PlantViewModel = viewModel()
     val plants by viewModel.plants.collectAsState()
+    val context = LocalContext.current
+
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(onClick = { navController.navigate("addPlant") }) {
-                Icon(Icons.Default.Add, contentDescription = "Add Plant")
+            FloatingActionButton(onClick = {
+                val intent = Intent(Intent.ACTION_SENDTO).apply {
+                    data = Uri.parse("mailto:")
+                    putExtra(Intent.EXTRA_EMAIL, arrayOf("support@plant.com"))
+                    putExtra(Intent.EXTRA_SUBJECT,"Plant App Info")
+                }
+                context.startActivity(intent)
+            }) {
+                Icon(Icons.Default.Email, contentDescription = "Send Email")
             }
         }
     ) { paddingValues ->
@@ -57,6 +70,14 @@ fun PlantsScreen(navController: NavController) {
                     Text(text = plants.name)
                 }
             }
+        }
+        Button(
+            onClick = { navController.navigate("addPlant") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Text("Add Plant")
         }
     }
 }

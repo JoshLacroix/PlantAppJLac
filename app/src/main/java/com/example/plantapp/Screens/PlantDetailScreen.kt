@@ -1,7 +1,5 @@
 package com.example.plantapp.Screens
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -19,6 +17,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.plantapp.PlantViewModel
 //import java.time.LocalDate
 //import java.time.temporal.ChronoUnit
 import org.threeten.bp.LocalDate
