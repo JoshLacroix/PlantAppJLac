@@ -1,8 +1,14 @@
 package com.example.plantapp
 
-import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.plantapp.data.AppDatabase
+import com.example.plantapp.data.PlantEntity
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 //import java.time.LocalDate
 import org.threeten.bp.LocalDate
 
@@ -15,41 +21,90 @@ data class Plant(
     val wateringInterval: Int,
     val notes: String
 )
-class PlantViewModel : ViewModel() {
-    private val _plants = MutableStateFlow<List<Plant>>(emptyList())
-    val plants: StateFlow<List<Plant>> = _plants
+class PlantViewModel(application: Application) : AndroidViewModel(application) {
+    private val plantDao = AppDatabase.getDatabase(application).plantDao()
+    val plants: Flow<List<Plant>> = plantDao.getAllPlants().map { entities ->
+        entities.map { entity ->
+            Plant(
+                id = entity.id,
+                name = entity.name,
+                species = entity.name,
+                imageResId = entity.imageResId,
+                lastWatered = entity.lastWatered,
+                wateringInterval = entity.wateringInterval,
+                notes = entity.notes
+            )
+        }
+    }
+
+
 
     init {
-        _plants.value = listOf(
-            Plant(
-                1,
-                "Basil",
-                "Ocimum basilicum",
-                R.drawable.ic_launcher_foreground,
-                LocalDate.now(),
-                7,
-                "Needs sunlight."
-            ),
-            Plant(
-                2,
-                "Rose",
-                "Rosa",
-                R.drawable.ic_launcher_foreground,
-                LocalDate.now().minusDays(5),
-                3,
-                "Water roots only."
-            )
-        )
+        viewModelScope.launch {
+            val existing = plantDao.getAllPlants().firstOrNull()
+            if (existing.isNullOrEmpty()) {
+                plantDao.insertPlant(PlantEntity(
+                    name = "Basil",
+                    species = "Ocimum basilicum",
+                    imageResId = R.drawable.ic_launcher_foreground,
+                    lastWatered = LocalDate.now(),
+                    wateringInterval = 7,
+                    notes = "Needs sunlight."
+                ))
+                plantDao.insertPlant(PlantEntity(
+                    name = "Rose",
+                    species = "Rosa",
+                    imageResId = R.drawable.ic_launcher_foreground,
+                    lastWatered = LocalDate.now().minusDays(5),
+                    wateringInterval = 3,
+                    notes = "Water roots only."
+                ))
+            }
+        }
     }
 
-    fun getPlantById(id: Int): Plant? = _plants.value.find { it.id == id }
+    fun getPlantById(id: Int): Flow<Plant?> {
+        return plantDao.getAllPlants().map { entities ->
+            entities.find { it.id == id }?.let { entity ->
+                Plant(
+                    id = entity.id,
+                    name = entity.name,
+                    species = entity.species,
+                    imageResId = entity.imageResId,
+                    lastWatered = entity.lastWatered,
+                    wateringInterval = entity.wateringInterval,
+                    notes = entity.notes
+                )
+            }
+        }
+    }
 
     fun addPlant(plant: Plant) {
-        _plants.value =
-            _plants.value + plant.copy(id = (_plants.value.maxOfOrNull { it.id } ?: 0) + 1)
+        viewModelScope.launch {
+            val entity = PlantEntity(
+                name = plant.name,
+                species = plant.species,
+                imageResId = plant.imageResId,
+                lastWatered = plant.lastWatered,
+                wateringInterval = plant.wateringInterval,
+                notes = plant.notes
+            )
+            plantDao.insertPlant(entity)
+        }
     }
 
-    fun updatePlant(updatedPlant: Plant) {
-        _plants.value = _plants.value.map { if (it.id == updatedPlant.id) updatedPlant else it }
+    fun updatePlant(plant: Plant) {
+        viewModelScope.launch {
+            val entity = PlantEntity(
+                id = plant.id,
+                name = plant.name,
+                species = plant.species,
+                imageResId = plant.imageResId,
+                lastWatered = plant.lastWatered,
+                wateringInterval = plant.wateringInterval,
+                notes = plant.notes
+            )
+            plantDao.updatePlant(entity)
+        }
     }
 }

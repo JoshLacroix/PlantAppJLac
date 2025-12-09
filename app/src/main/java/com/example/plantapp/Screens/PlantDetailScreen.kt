@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -18,15 +19,15 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.plantapp.PlantViewModel
-//import java.time.LocalDate
-//import java.time.temporal.ChronoUnit
+import kotlinx.coroutines.flow.flowOf
 import org.threeten.bp.LocalDate
 import org.threeten.bp.temporal.ChronoUnit
 
 @Composable
 fun PlantDetailScreen(navController: NavController,plantId: Int?) {
     val viewModel: PlantViewModel = viewModel()
-    val plant = plantId?.let { viewModel.getPlantById(it) }
+    val plantState = (plantId?.let { viewModel.getPlantById(it) } ?: flowOf(null)).collectAsState(initial = null)
+    val plant = plantState.value
 
     if (plant == null) {
         Text("Plant not found", modifier = Modifier.fillMaxSize().wrapContentSize())
@@ -50,7 +51,7 @@ fun PlantDetailScreen(navController: NavController,plantId: Int?) {
         Text("Name ${plant.name}")
         Text("Species: ${plant.species}")
         Text("Last Watered: ${plant.lastWatered}")
-        Text("Days Until Next Watering: ${wateringStatus}")
+        Text("Days Until Next Watering: $wateringStatus")
         Text("Notes: ${plant.notes}")
 
         Spacer(modifier = Modifier.height(16.dp))

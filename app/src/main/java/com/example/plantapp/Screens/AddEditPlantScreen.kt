@@ -14,6 +14,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -25,19 +27,32 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.plantapp.Plant
 import com.example.plantapp.PlantViewModel
+import kotlinx.coroutines.flow.flowOf
 import org.threeten.bp.LocalDate
 import org.threeten.bp.format.DateTimeFormatter
 
 @Composable
 fun AddEditPlantScreen(navController: NavController,plantId: Int?) {
     val viewModel: PlantViewModel = viewModel()
-    val existingPlant = plantId?.let { viewModel.getPlantById(it) }
-    var name by remember { mutableStateOf(existingPlant?.name ?: "") }
-    var species by remember { mutableStateOf(existingPlant?.species ?: "") }
-    var imageResId by remember { mutableStateOf(existingPlant?.imageResId?.toString() ?: "") }
-    var lastWatered by remember { mutableStateOf(existingPlant?.lastWatered ?: LocalDate.now()) }
-    var wateringInterval by remember { mutableStateOf(existingPlant?.wateringInterval?.toString() ?: "7") }
-    var notes by remember { mutableStateOf(existingPlant?.notes ?: "") }
+    val existingPlant by (plantId?.let { viewModel.getPlantById(it) } ?: flowOf(null)).collectAsState(initial = null)
+
+    var name by remember { mutableStateOf("") }
+    var species by remember { mutableStateOf("") }
+    var imageResId by remember { mutableStateOf("") }
+    var lastWatered by remember { mutableStateOf(LocalDate.now()) }
+    var wateringInterval by remember { mutableStateOf("7") }
+    var notes by remember { mutableStateOf("") }
+
+    LaunchedEffect(existingPlant) {
+        existingPlant?.let { plant ->
+            name = plant.name
+            species = plant.species
+            imageResId = plant.imageResId.toString()
+            lastWatered = plant.lastWatered
+            wateringInterval = plant.wateringInterval.toString()
+            notes = plant.notes
+        }
+    }
 
     var showDatePicker by remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState(
