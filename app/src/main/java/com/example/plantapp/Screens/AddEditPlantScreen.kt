@@ -9,6 +9,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -30,15 +35,24 @@ import com.example.plantapp.PlantViewModel
 import kotlinx.coroutines.flow.flowOf
 import org.threeten.bp.LocalDate
 import org.threeten.bp.format.DateTimeFormatter
+import com.example.plantapp.R
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddEditPlantScreen(navController: NavController,plantId: Int?) {
     val viewModel: PlantViewModel = viewModel()
     val existingPlant by (plantId?.let { viewModel.getPlantById(it) } ?: flowOf(null)).collectAsState(initial = null)
+    val imageOptions = listOf(
+        "Default Plant" to R.drawable.plant,
+        "Fruit" to R.drawable.fruits,
+        "Vegetable" to R.drawable.vegetable,
+        "Flower" to R.drawable.tulips,
+        "Spice" to R.drawable.spices
+    )
 
     var name by remember { mutableStateOf("") }
     var species by remember { mutableStateOf("") }
-    var imageResId by remember { mutableStateOf("") }
+    var selectedImage by remember { mutableStateOf(imageOptions[0]) }
     var lastWatered by remember { mutableStateOf(LocalDate.now()) }
     var wateringInterval by remember { mutableStateOf("7") }
     var notes by remember { mutableStateOf("") }
@@ -47,7 +61,7 @@ fun AddEditPlantScreen(navController: NavController,plantId: Int?) {
         existingPlant?.let { plant ->
             name = plant.name
             species = plant.species
-            imageResId = plant.imageResId.toString()
+            selectedImage = imageOptions.find { it.second == plant.imageResId } ?: imageOptions[0]
             lastWatered = plant.lastWatered
             wateringInterval = plant.wateringInterval.toString()
             notes = plant.notes
@@ -70,10 +84,32 @@ fun AddEditPlantScreen(navController: NavController,plantId: Int?) {
             value = species,
             onValueChange = { species = it },
             label = { Text("Species") })
-        OutlinedTextField(
-            value = imageResId,
-            onValueChange = { imageResId = it },
-            label = { Text("Image Resource ID") })
+
+        var expanded by remember { mutableStateOf(false) }
+        ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
+            OutlinedTextField(
+                value = selectedImage.first,
+                onValueChange = {},
+                readOnly = true,
+                label = { Text("Plant Image") },
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                modifier = Modifier.menuAnchor()
+            )
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                imageOptions.forEach { option ->
+                    DropdownMenuItem(
+                        text = { Text(option.first) },
+                        onClick = {
+                            selectedImage = option
+                            expanded = false
+                        }
+                    )
+                }
+            }
+        }
         OutlinedTextField(
             value = lastWatered.format(DateTimeFormatter.ISO_LOCAL_DATE),
             onValueChange = {},
@@ -89,7 +125,7 @@ fun AddEditPlantScreen(navController: NavController,plantId: Int?) {
         Button(onClick = {
             try {
                 val interval = wateringInterval.toInt()
-                val imageId = imageResId.toIntOrNull() ?: com.example.plantapp.R.drawable.ic_launcher_background
+                val imageId = selectedImage.second
                 val plant = Plant(
                     id = existingPlant?.id ?: 0,
                     name = name,

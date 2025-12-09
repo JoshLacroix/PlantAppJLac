@@ -50,6 +50,16 @@ fun PlantsScreen(navController: NavController) {
             }) {
                 Icon(Icons.Default.Email, contentDescription = "Send Email")
             }
+        },
+        bottomBar = {
+            Button(
+                onClick = { navController.navigate("addPlant") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Text("Add Plant")
+            }
         }
     ) { paddingValues ->
         LazyColumn(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
@@ -70,14 +80,6 @@ fun PlantsScreen(navController: NavController) {
                     Text(text = plants.name)
                 }
             }
-        }
-        Button(
-            onClick = { navController.navigate("addPlant") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Text("Add Plant")
         }
     }
 }

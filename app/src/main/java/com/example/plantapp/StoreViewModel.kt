@@ -28,4 +28,11 @@ class StoreViewModel : ViewModel() {
         val currentQty = _quantities.value[itemName] ?: 0
         _quantities.value = _quantities.value + (itemName to currentQty + 1)
     }
+
+    fun removeItem(itemName: String) {
+        val currentQty = _quantities.value[itemName] ?: 0
+        if (currentQty > 0) {
+            _quantities.value = _quantities.value + (itemName to currentQty - 1)
+        }
+    }
 }

@@ -35,8 +35,14 @@ fun StoreScreen(navController: NavController) {
                     Text("${item.name} - ${currencyFormatter.format(item.price)}")
                     Text("Quantity: $qty")
                 }
-                Button(onClick = { viewModel.addItem(item.name) }) {
-                    Text("Add")
+                Row {
+                    Button(onClick = { viewModel.removeItem(item.name) }, enabled = qty > 0) {
+                        Text("Remove")
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Button(onClick = { viewModel.addItem(item.name) }) {
+                        Text("Add")
+                    }
                 }
             }
         }
